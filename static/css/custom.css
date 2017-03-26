@@ -23,6 +23,10 @@
     height:400px;
 }
 
+#product-container {
+    position: relative;
+}
+
 .u-small-padding {
     padding: 10px 0px 10px 0px;
 }
