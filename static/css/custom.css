@@ -1,0 +1,36 @@
+#product-id {
+    visibility=hidden;
+}
+
+#user-form-container {
+    max-width: 400px;
+}
+
+#welcome-header {
+    padding: 80px 0px 0px 0px;
+}
+
+#product-name {
+    margin-bottom: 0;
+}
+
+#like-buttons-container {
+    max-width: 400px;
+    margin: auto;
+}
+
+#product-img{
+    height:400px;
+}
+
+.u-small-padding {
+    padding: 10px 0px 10px 0px;
+}
+
+.u-center {
+    text-align: center;
+}
+
+.ui-loader h1 {
+    font-size: 0em;
+}

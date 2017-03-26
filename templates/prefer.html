@@ -1,22 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+
+    <!-- Basic Page Needs
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta charset="utf-8">
     <title>Prefer</title>
-    <!-- Include meta tag to ensure proper rendering and touch zooming -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Mobile Specific Metas
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Include the jQuery library -->
+
+    <!-- FONT
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link href="https://fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+    <!-- CSS
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link rel="stylesheet" href="static/css/custom.css">
+    <link rel="stylesheet" href="static/css/skeleton.css">
+    <link rel="stylesheet" href="static/css/normalize.css">
+
+    <!-- Javascript
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
     <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-    <!-- Include the jQuery Mobile library -->
     <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
-    <script type="text/javascript"  src="/static/scripts/swipe.js"></script>
+    <script type="text/javascript"  src="static/scripts/swipe.js"></script>
+
 </head>
 <body>
-    <h1>What is your preference?</h1>
-    <h3 id="product-name">{{product_name}}</h3>
-    <img id="product-img" src="{{product_image}}" style="height:400px;">
-    <p class="preference-button" id="like-button">Like</p>
-    <p class="preference-button" id="dislike-button">Dislike</p>
-    <p style="visibility: hidden" id="product-id">{{product_id}}</p>
+    <div class="container">
+        <div class="row u-center">
+            <h1>What is your preference?</h1>
+        </div>
+        <div class="row u-center" id="product-container">
+            <div class="img-container">
+                <img id="product-img" src="{{product_image}}">
+            </div>
+            <p id="product-name">{{product_name}}</p>
+        </div>
+        <div class="row u-center">
+            <div id="like-buttons-container">
+                <div class="one-half column u-small-padding">
+                    <button class="preference-button button-primary" id="like-button">Like</button>
+                </div>
+                <div class="one-half column u-small-padding">
+                    <button class="preference-button button-primary" id="dislike-button">Dislike</button>
+                </div>
+                <p style="visibility: hidden" id="product-id">{{product_id}}</p>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
