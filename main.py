@@ -1,11 +1,8 @@
-from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
+from flask import Flask, request, render_template, redirect, url_for
 import uuid
 import numpy as np
 
-
-
 app = Flask(__name__)
-
 
 products = {'bde42acfb0cb47029837fec8ee577da4': ['plate', 'crate_and_barrel', 'white'],
             'cd5660f952ed44139257d4dac01e13bf': ['silverware', 'crate_and_barrel', 'silver'],
@@ -17,65 +14,51 @@ users = {'faac231bc26047719e7ef9961bfe7275': ['John Smith', 'male', 27],
 
 ratings = {}
 
+session_user_id = None # TODO: this should be replaced with write to / read from RDS
 
-PAGE_TEMPLATE = '''
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Perfer</title>
-</head>
-<body>
-    <h1>What is your preference?</h1>
-    <h3>%s</h3>
-    <form action="/perfer" method=post enctype=multipart/form-data>
-        <button type="submit" name = 'button' value = '1:%s'>Like</button>
-        <button type="submit" name = 'button' value = '0:%s'>Dislike</button>
-
-    </form>
-</body>
-</html>
-'''
+@app.route("/", methods=["GET"])
+def index():
+    return app.send_static_file('user_form.html')
 
 
+@app.route("/user", methods=["POST"])
+def user_form():
+    name = request.form['name']
+    gender = request.form['gender']
+    age = request.form['age']
 
-def gen_perfer_page():
-    random_product_id = np.random.choice(list(products.keys()),1)[0]
-    product =products[random_product_id][0]
-    return PAGE_TEMPLATE %(product, random_product_id, random_product_id)
+    global session_user_id # TODO: remove and replace with RDS
 
+    session_user_id = uuid.uuid4().hex
 
-session_user_id = None
-@app.route("/form", methods=["POST", "GET"])
-def userForm():
-    if request.method == "POST":
-        name = request.form['name']
-        gender = request.form['gender']
-        age = request.form['age']
-        global session_user_id
-        session_user_id = uuid.uuid4().hex
-        users[session_user_id] = [name, gender, int(age)]
-        page = gen_perfer_page()
-        print(users)
-        return page
+    users[session_user_id] = [name, gender, int(age)] # TODO: write to RDS
+    print(users)
+
+    return redirect(url_for('prefer'))
+
+@app.route("/prefer", methods=["POST", "GET"])
+def prefer():
+
+    if request.method == "GET": # first time on page
+        product = products.items()[0]
+        product_id = product[0]
+        product_name = product[1][0]
+        return render_template('prefer.html', product_name=product_name, product_id=product_id)  # TODO: should be the default item
+
     else:
-        return app.send_static_file('user_form.html')
+        rating = request.form['rating']
+        product_id = request.form['id']
+        print rating
+        print product_id
 
+        ratings[(session_user_id, product_id)] = rating # TODO: write to RDS
 
-@app.route("/perfer", methods=["POST", "GET"])
-def getRating():
-    if request.method == "POST":
-        rating_productid = request.form['button'].split(':')
-        rating = int(rating_productid[0])
-        product_id = rating_productid[1]
-        print(rating_productid)
-        ratings[(session_user_id, product_id)] = rating
+        # TODO: this should be generated using backservice
+        new_product = products.items()[1]
+        new_product_id = new_product[0]
+        new_product_name = new_product[1][0]
 
-        print(ratings)
-
-        page = gen_perfer_page()
-        return page
-
+        return render_template('prefer.html', product_name=new_product_name, product_id=new_product_id)
 
 
 app.run()
