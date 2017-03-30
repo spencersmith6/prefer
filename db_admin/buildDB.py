@@ -98,10 +98,6 @@ def main(args):
         print """Both Tables Already Exist
                     Please reevaluate your life or manually drop both tables and rerun this script."""
 
-
-    print "Building Review Queries"
-    review_inserted = sql_helper.buildReviewQueries(conn, datapath, 'kcore_5.strict.json')
-
     print 'Closing Connection'
     conn.close()
     print 'Finished'
