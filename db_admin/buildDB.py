@@ -24,11 +24,11 @@ def downloadData(datapath, filenames):
 def parse(path):
     g = gzip.open(path, 'r')
     for l in g:
-        yield json.dumps(eval(l))
+        yield eval(l)
 
 
 # This function was taken from http://jmcauley.ucsd.edu/data/amazon/links.html
-def write_strict_json(datapath, infile):
+def write_strict_meta_json(datapath, infile):
     # Build outfile name
     outfile = "{}.strict.json".format(infile.split('.')[0])
     # If outfile does not already exist
@@ -36,22 +36,28 @@ def write_strict_json(datapath, infile):
         # Write strict json to outfile
         with open(datapath+outfile, 'w') as f:
             for l in parse(datapath+infile):
-                f.write(l + '\n')
+                f.write(json.dumps(l) + '\n')
             f.close()
     return None
 
 
-def getPsqlCur(creds):
-    try:
-        # Connect to the database
-        conn = psycopg2.connect("dbname='{}' user='{}' host='{}' password='{}'".format(
-            creds['dbname'], creds['user'], creds['host'], creds['password']))
-    except:
-        print "I am unable to connect to the database"
-        return None
-    # Return the connection and the cursor
-    cur = conn.cursor()
-    return conn, cur
+def write_strict_review_json(datapath, infile):
+    # Build outfile name
+    outfile = "{}.strict.json".format(infile.split('.')[0])
+    missing_count = 0
+    # If outfile does not already exist
+    if not os.path.isfile(datapath + outfile):
+        # Write strict json to outfile
+        with open(datapath+outfile, 'w') as f:
+            for tmp in parse(datapath+infile):
+                try:
+                    filtered_json = {"reviewerid": tmp['reviewerID'], "asin": tmp["asin"], "overall": str(tmp['overall'])}
+                    f.write(json.dumps(filtered_json) + '\n')
+                except KeyError:
+                    missing_count += 1
+            f.close()
+    print "Build Review Strict JSON: {} Missing Entries".format(missing_count)
+    return None
 
 
 def main(args):
@@ -66,38 +72,38 @@ def main(args):
     downloaded = downloadData(datapath, filenames)
 
     print "Writing Strict JSON"
-    strictly_written = [write_strict_json(datapath, i) for i in filenames]
+    strictly_written_meta = write_strict_meta_json(datapath, filenames[0])
+    strictly_written_review = write_strict_review_json(datapath, filenames[1])
 
     print "Connecting to Database"
-    conn, cur = getPsqlCur(creds)
+    conn = sql_helper.getPsqlConn(creds)
 
     print "Checking for Existing Tables"
-    tables_exist = sql_helper.checkTables(cur)
+    tables_exist = sql_helper.checkTables(conn)
 
     if sum(tables_exist) != 2:
 
         print 'Tables Do Not Exist\nBuilding Tables'
-        builtTable = sql_helper.buildTables(cur, conn)
+        builtTable = sql_helper.buildTables(conn)
 
         if not tables_exist[0]:
-            print "Building Metadata Insert Query"
-            meta_insert_query = sql_helper.buildMetaSQLQuery(datapath)
-            print "Inserting Metadata"
-            meta_inserted = sql_helper.writeToDB(cur, conn, meta_insert_query)
+            print "Building Metadata Queries"
+            meta_inserted = sql_helper.buildMetaQueries(conn, datapath, 'metadata.strict.json')
 
         if not tables_exist[1]:
             print "Building Review Insert Query"
-            review_insert_query = sql_helper.buildMetaSQLQuery(datapath)
-            print "Inserting Reviews"
-            review_inserted = sql_helper.writeToDB(cur, conn, review_insert_query)
+            review_inserted = sql_helper.buildReviewQueries(conn, datapath, 'kcore_5.strict.json')
 
     else:
         print """Both Tables Already Exist
                     Please reevaluate your life or manually drop both tables and rerun this script."""
 
+
+    print "Building Review Queries"
+    review_inserted = sql_helper.buildReviewQueries(conn, datapath, 'kcore_5.strict.json')
+
     print 'Closing Connection'
     conn.close()
-    cur.close()
     print 'Finished'
 
 
