@@ -24,6 +24,7 @@ def index():
 
 @app.route("/user", methods=["POST"])
 def user_form():
+    print request.form
     name = request.form['name']
     gender = request.form['gender']
     age = request.form['age']
@@ -69,4 +70,5 @@ def next_prefer():
                    product_id=new_product_id,
                    product_image=new_product_image)
 
-app.run(host='0.0.0.0')
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')
