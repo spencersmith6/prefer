@@ -54,8 +54,8 @@ def prefer():
 def next_prefer():
     rating = request.form.get('preference', type=str)
     product_id = request.form.get('product_id', type=str)
-    print rating
-    print product_id
+    print(rating)
+    print(product_id)
 
     ratings[(session_user_id, product_id)] = rating # TODO: write to RDS
 
@@ -69,4 +69,6 @@ def next_prefer():
                    product_id=new_product_id,
                    product_image=new_product_image)
 
-app.run(host='0.0.0.0')
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')
