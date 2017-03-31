@@ -26,11 +26,6 @@
     <!-- Javascript
     –––––––––––––––––––––––––––––––––––––––––––––––––– -->
     <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-    <!-- Adjust swipe settings -->
-    <script type="text/javascript">
-        $(document).bind("mobileinit", function () {
-            $.event.special.swipe.horizontalDistanceThreshold = 100;
-        });
     </script>
     <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
     <script type="text/javascript"  src="static/scripts/swipe.js"></script>
@@ -50,10 +45,10 @@
         <div class="row u-center">
             <div id="like-buttons-container">
                 <div class="one-half column u-small-padding">
-                    <button class="preference-button button-primary" id="like-button">Like</button>
+                    <button class="preference-button button-primary" id="dislike-button">Dislike</button>
                 </div>
                 <div class="one-half column u-small-padding">
-                    <button class="preference-button button-primary" id="dislike-button">Dislike</button>
+                    <button class="preference-button button-primary" id="like-button">Like</button>
                 </div>
                 <p style="visibility: hidden" id="product-id">{{product_id}}</p>
             </div>
