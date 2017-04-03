@@ -3,6 +3,14 @@ import os.path
 import json
 import re
 
+
+# Get DB connection using creds file_path
+def getConn(creds_filepath):
+    with open(creds_filepath) as f:
+        creds = json.loads(f.read())
+        return getPsqlConn(creds)
+
+
 def getPsqlConn(creds):
     try:
         # Connect to the database
@@ -50,12 +58,12 @@ def checkTables(conn):
 
 def buildMetaTable(conn):
     query = """CREATE TABLE IF NOT EXISTS item_meta (
-asin  VARCHAR,
-title VARCHAR,
-description VARCHAR,
-price VARCHAR,
-brand VARCHAR,
-imurl VARCHAR
+                asin  VARCHAR,
+                title VARCHAR,
+                description VARCHAR,
+                price VARCHAR,
+                brand VARCHAR,
+                imurl VARCHAR
 );"""
     writeToDB(getCur(conn), conn, query)
     return None
@@ -63,9 +71,20 @@ imurl VARCHAR
 
 def buildReviewTable(conn):
     query = """CREATE TABLE IF NOT EXISTS reviews (
-reviewerid VARCHAR,
-asin VARCHAR,
-overall VARCHAR
+                reviewerid VARCHAR,
+                asin VARCHAR,
+                overall VARCHAR
+);"""
+    writeToDB(getCur(conn), conn, query)
+    return None
+
+
+def buildUserTable(conn):
+    query = """CREATE TABLE IF NOT EXISTS user_meta (
+                user_id VARCHAR primary key,
+                name VARCHAR,
+                gender VARCHAR,
+                age INT
 );"""
     writeToDB(getCur(conn), conn, query)
     return None
@@ -74,6 +93,7 @@ overall VARCHAR
 def buildTables(conn):
     buildMetaTable(conn)
     buildReviewTable(conn)
+    buildUserTable(conn)
     return None
 
 
