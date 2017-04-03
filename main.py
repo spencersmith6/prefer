@@ -1,11 +1,11 @@
-from flask import Flask, request, render_template, redirect, url_for, jsonify
+from flask import Flask, request, render_template, redirect, url_for, jsonify, make_response
 import uuid
-import numpy as np
 from db_admin.sql_helper import getConn, getCur
 from utils.db_utils import get_item_by_id, write_new_user_to_db, write_new_rating_to_db
 import random
 
 app = Flask(__name__)
+
 
 @app.route("/", methods=["GET"])
 def index():
@@ -42,8 +42,6 @@ def user_form():
 @app.route("/prefer", methods=["GET"])
 def prefer():
 
-    # TODO: if this user doesn't have a cookie, set it and write to db with null values
-
     # get any item from the database
     conn = getConn('db_admin/creds.json')
     cur = getCur(conn)
@@ -52,14 +50,21 @@ def prefer():
     cur.close()
     conn.close()
 
-    # return to client
+    # create response to client
     item_id = item['id']
     item_name = item['title']
     item_image = item['im_url']
-    return render_template('prefer.html',
+    resp = make_response(render_template('prefer.html',
                            product_name=item_name,
                            product_id=item_id,
-                           product_image=item_image)
+                           product_image=item_image))
+
+    # check if the user has a cookie already, if not, set it
+    if 'userID' not in request.cookies:
+        session_user_id = str(uuid.uuid4().hex)
+        resp.set_cookie('userID', session_user_id)
+
+    return resp
 
 
 @app.route("/next_prefer", methods=["POST"])
@@ -71,7 +76,7 @@ def next_prefer():
     preference = request.form.get('preference', type=str)
     rating = preference_to_rating[preference]
     product_id = request.form.get('product_id', type=str)
-    user_id = request.cookies['userID']
+    user_id = request.cookies.get('userID')
     print rating
     print product_id
     print user_id
@@ -80,15 +85,10 @@ def next_prefer():
     conn = getConn('db_admin/creds.json')
     cur = getCur(conn)
     write_new_rating_to_db(cur, user_id, product_id, rating)
-    conn.commit()
-    cur.close()
-    conn.close()
 
+    # get new item
     # TODO: this should be generated using backend service, for now, it's random
     item_ids = ['0002200120','0002234572','0002237245','0002231832','0002218615']
-
-    conn = getConn('db_admin/creds.json')
-    cur = getCur(conn)
     new_item = get_item_by_id(cur, item_id=random.choice(item_ids))
     conn.commit()
     cur.close()
