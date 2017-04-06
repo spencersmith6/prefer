@@ -1,5 +1,5 @@
 # Get Datapath from user input
-DATAPATH = $1
+DATAPATH=$1
 
 # Get psql credentials from data/creds.json
 HOST=`/usr/local/bin/jq-osx-amd64 .host data/creds.json`

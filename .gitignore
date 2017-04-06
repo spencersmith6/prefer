@@ -2,3 +2,7 @@
 *.json
 *.gz
 *.pyc
+*.enc
+/db_admin/data/*_inserts/*
+.idea/*
+*.xml
