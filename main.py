@@ -1,20 +1,11 @@
-from flask import Flask, request, render_template, redirect, url_for, jsonify
+from flask import Flask, request, render_template, redirect, url_for, jsonify, make_response
 import uuid
+from db_admin.sql_helper import getConn, getCur
+from utils.db_utils import get_item_by_id, write_new_user_to_db, write_new_rating_to_db
+import random
 import numpy as np
 
 app = Flask(__name__)
-
-products = {'bde42acfb0cb47029837fec8ee577da4': ['plate', 'crate_and_barrel', 'white','https://images.crateandbarrel.com/is/image/Crate/MarinWhiteDinner10p5inSHF15/$web_setitem326$/160203171115/marin-white-dinner-plate.jpg'],
-            'cd5660f952ed44139257d4dac01e13bf': ['silverware', 'crate_and_barrel', 'silver','https://images.crateandbarrel.com/is/image/Crate/BoulderPlacesetting5PcS13/$web_product_hero$&/150611091025/boulder-flatware.jpg'],
-            'ed4790d2de904199b392353e4fc72848': ['bracelet', 'urban_outfitter', 'leather','http://images.urbanoutfitters.com/is/image/UrbanOutfitters/41548157_070_b?$mlarge$&defaultImage='],
-            '34d16774f5b14ba2ac623d71c04bf46a': ['shoes', 'nike', 'white','http://images.nike.com/is/image/DotCom/511881_A_V2?&$img=511881_112_A_PREM&$PDP_HERO_M$']}
-
-users = {'faac231bc26047719e7ef9961bfe7275': ['John Smith', 'male', 27],
-         '8e9f1079e37147369664ad0024cea599': ['Jane Roberts', 'male', 29]}
-
-ratings = {}
-
-session_user_id = None # TODO: this should be replaced with write to / read from RDS
 
 
 @app.route("/", methods=["GET"])
@@ -24,51 +15,90 @@ def index():
 
 @app.route("/user", methods=["POST"])
 def user_form():
+
+    # Get data from form
     print request.form
     name = request.form['name']
     gender = request.form['gender']
     age = request.form['age']
 
-    global session_user_id # TODO: remove and replace with set cookie
+    # Generate user ID and set cookie
+    session_user_id = str(uuid.uuid4().hex)
+    resp = redirect(url_for('prefer'))
+    resp.set_cookie('userID', session_user_id)
 
-    session_user_id = uuid.uuid4().hex
+    # Write user data with session id to db
+    conn = getConn('db_admin/creds.json')
+    cur = getCur(conn)
+    user = {'id': session_user_id, 'name': name, 'gender': gender, 'age': int(age)}
+    print(user)
+    write_new_user_to_db(cur, user)
+    conn.commit()
+    cur.close()
+    conn.close()
 
-    users[session_user_id] = [name, gender, int(age)] # TODO: write to RDS
-    print(users)
-
-    return redirect(url_for('prefer'))
+    return resp
 
 
 @app.route("/prefer", methods=["GET"])
 def prefer():
-    product = products.items()[0]
-    product_id = product[0]
-    product_name = product[1][0]
-    product_image = product[1][3]
-    return render_template('prefer.html',
-                           product_name=product_name,
-                           product_id=product_id,
-                           product_image=product_image)  # TODO: should be the default item
+
+    # get any item from the database
+    conn = getConn('db_admin/creds.json')
+    cur = getCur(conn)
+    item = get_item_by_id(cur)
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    # create response to client
+    item_id = item['id']
+    item_name = item['title']
+    item_image = item['im_url']
+    resp = make_response(render_template('prefer.html',
+                           product_name=item_name,
+                           product_id=item_id,
+                           product_image=item_image))
+
+    # check if the user has a cookie already, if not, set it
+    if 'userID' not in request.cookies:
+        session_user_id = str(uuid.uuid4().hex)
+        resp.set_cookie('userID', session_user_id)
+
+    return resp
 
 
 @app.route("/next_prefer", methods=["POST"])
 def next_prefer():
-    rating = request.form.get('preference', type=str)
+    # define preference to rating dictionary
+    preference_to_rating = {"Dislike": 0.0, "Like": 1.0}
+
+    # get user swipe preference
+    preference = request.form.get('preference', type=str)
+    rating = preference_to_rating[preference]
     product_id = request.form.get('product_id', type=str)
-    print(rating)
-    print(product_id)
 
-    ratings[(session_user_id, product_id)] = rating # TODO: write to RDS
+    user_id = request.cookies.get('userID')
+    print rating
+    print product_id
+    print user_id
 
-    # TODO: this should be generated using backend service
-    new_product = products.items()[np.random.choice(range(len(products)))]
-    new_product_id = new_product[0]
-    new_product_name = new_product[1][0]
-    new_product_image = new_product[1][3]
+    # write to db
+    conn = getConn('db_admin/creds.json')
+    cur = getCur(conn)
+    write_new_rating_to_db(cur, user_id, product_id, rating)
 
-    return jsonify(product_name=new_product_name,
-                   product_id=new_product_id,
-                   product_image=new_product_image)
+    # get new item
+    # TODO: this should be generated using backend service, for now, it's random
+    item_ids = ['0002200120','0002234572','0002237245','0002231832','0002218615']
+    new_item = get_item_by_id(cur, item_id=random.choice(item_ids))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return jsonify(product_name=new_item['title'],
+                   product_id=new_item['id'],
+                   product_image=new_item['im_url'])
 
 
 app.run(host='0.0.0.0')
