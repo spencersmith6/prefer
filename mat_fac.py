@@ -14,6 +14,7 @@ import numpy as np
 from keras.layers import Embedding, Flatten
 from keras.engine import Input
 from keras.regularizers import l2
+from time import time
 
 
 
@@ -28,7 +29,15 @@ def create_bias(inp, n_in):
 conn = getConn('db_admin/creds.json')
 cur = getCur(conn)
 
-dataDF = pd.read_sql('SELECT reviewerid, reviews.asin AS asin, overall, title FROM reviews LEFT JOIN item_meta ON reviews.asin = item_meta.asin LIMIT 10000;', conn)
+
+
+st = time()
+query = 'SELECT reviewerid, reviews.asin AS asin, overall, title FROM reviews LEFT JOIN item_meta ON reviews.asin = item_meta.asin LIMIT 100000;'
+dataDF = pd.read_sql(query, conn)
+print(time()-st)
+
+
+
 
 title_dict = dataDF.set_index('asin')['title'].to_dict()
 ratingsDF = dataDF[['reviewerid', 'asin', 'overall']]
@@ -68,6 +77,8 @@ x = merge([x, product_bias], mode='sum')
 model = Model([reviewer_in, product_in], x)
 model.compile(Adam(0.001), loss='mse')
 
+print('done')
+
 model.fit([train.reviewerid, train.asin], train.overall, batch_size=64, nb_epoch=1,
           validation_data=([validate.reviewerid, validate.asin], validate.overall))
 model.optimizer.lr=0.01
@@ -98,3 +109,30 @@ product_ratings = [(b[0], title_dict[products[i]]) for i,b in zip(topProducts,pr
 sorted(product_ratings, key=itemgetter(0))[:15]
 sorted(product_ratings, key=itemgetter(0), reverse=True)[:15]
 
+get_movie_emb = Model(product_in, p)
+product_emb = np.squeeze(get_movie_emb.predict([topProducts]))
+product_emb.shape
+
+
+from sklearn.decomposition import PCA
+pca = PCA(n_components=3)
+movie_pca = pca.fit(product_emb.T).components_
+
+fac0 = movie_pca[0]
+product_comp = [(f, title_dict[products[i]]) for f,i in zip(fac0, topProducts)]
+sorted(product_comp, key=itemgetter(0), reverse=True)[:10]
+sorted(product_comp, key=itemgetter(0))[:10]
+
+fac1 = movie_pca[1]
+product_comp = [(f, title_dict[products[i]]) for f,i in zip(fac1, topProducts)]
+sorted(product_comp, key=itemgetter(0), reverse=True)[:10]
+sorted(product_comp, key=itemgetter(0))[:10]
+
+start=50; end=100
+X = fac0[start:end]
+Y = fac1[start:end]
+plt.figure(figsize=(15,15))
+plt.scatter(X, Y)
+for i, x, y in zip(topProducts[start:end], X, Y):
+    plt.text(x,y,title_dict[products[i]], color=np.random.rand(3)*0.7, fontsize=14)
+plt.show()
