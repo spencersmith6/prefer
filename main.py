@@ -88,7 +88,7 @@ def next_prefer():
 
     # get new item
     # TODO: this should be generated using backend service, for now, it's random
-    item_ids = ['0002200120','0002234572','0002237245','0002231832','0002218615']
+    item_ids = ['0615391206','0587218959','0578060604','0587217189', '095650843X']
     new_item = get_item_by_id(cur, item_id=random.choice(item_ids))
     conn.commit()
     cur.close()
@@ -100,3 +100,5 @@ def next_prefer():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
+
+

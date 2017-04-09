@@ -143,7 +143,8 @@ def buildUserTable(conn):
                 user_id VARCHAR primary key,
                 name VARCHAR,
                 gender VARCHAR,
-                age INT
+                age INT,
+                num_reviews INT DEFAULT 0
 );"""
     writeToDB(getCur(conn), conn, query)
     return None
