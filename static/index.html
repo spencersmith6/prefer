@@ -31,27 +31,12 @@
     </div>
     <div class="container" id="user-form-container">
         <div class="row">
-            <form action="/user" method=post enctype=multipart/form-data>
-                <div class="row u-small-padding">
-                    <label user-form->Name:</label>
-                    <input type="text" name="name" class="u-full-width">
-                </div>
-                <div class="row u-small-padding">
-                    <label user-form-input>Gender:</label>
-                    <select class="u-full-width" name="gender">
-                        <option selected="selected">NA</option>
-                        <option value="female">Female</option>
-                        <option value="male">Male</option>
-                    </select>
-                </div>
-                <div class="row u-small-padding">
-                    <label user-form-input>Age:</label>
-                    <input type="text" name="age" class="u-full-width">
-                </div>
-                <div class="row u-small-padding u-center">
-                    <input id="user-form-submit" class="button-primary" type="submit" value="Submit">
-                </div>
-            </form>
+            <div class="one-half column u-small-padding u-center">
+                <a class="button button-primary" href="/login">Login</a>
+            </div>
+            <div class="one-half column u-small-padding u-center">
+                <a class="button button-primary" href="/signup">Sign-Up</a>
+            </div>
         </div>
     </div>
 </body>

@@ -45,3 +45,15 @@ def write_new_rating_to_db(cur, user_id, item_id, rating):
     cur.execute(query)
     return None
 
+
+def check_if_user_in_db(cur, user_id):
+    """fetch item data based on item_id string"""
+
+    query = """ SELECT * FROM user_meta WHERE user_id = '%s';""" %(user_id)
+    cur.execute(query)
+
+    if cur.fetchone():
+        return True
+    else:
+        return False
+
