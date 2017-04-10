@@ -19,12 +19,10 @@
     margin: auto;
 }
 
-#product-img{
-    height:400px;
-}
-
 #product-container {
     position: relative;
+    height:400px;
+    max-width: 100%;
 }
 
 .u-small-padding {

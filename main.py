@@ -13,8 +13,8 @@ def index():
 
 
 @app.route("/signup", methods=["GET"])
-def signup():
-    return app.send_static_file('signup.html')
+def signup(error=None):
+    return render_template('signup.html', error=error)
 
 
 @app.route("/login", methods=["GET"])
@@ -22,8 +22,8 @@ def login(error=None):
     return render_template('login.html', error=error)
 
 
-@app.route("/new-user", methods=["POST"])
-def new_user():
+@app.route("/post-signup", methods=["POST"])
+def post_signup():
 
     # Get data from form
     print request.form
@@ -32,16 +32,29 @@ def new_user():
     gender = request.form['gender']
     age = request.form['age']
 
-    # Set cookie as user ID
-    resp = redirect(url_for('prefer'))
-    resp.set_cookie('userID', user_id)
-
-    # Write user data with session id to db
+    # open connection
     conn = getConn('db_admin/creds.json')
     cur = getCur(conn)
-    user = {'id': user_id, 'name': name, 'gender': gender, 'age': int(age)}
-    print(user)
-    write_new_user_to_db(cur, user)
+
+    # check whether user is in user database already
+    in_db = check_if_user_in_db(cur, user_id)
+
+    if in_db:
+        # Return sign-up with error
+        resp = signup(error='Username already exists.')
+    else:
+        # Set cookie as user ID
+        resp = redirect(url_for('prefer'))
+        resp.set_cookie('userID', user_id)
+
+        # Write user data with session id to db
+        conn = getConn('db_admin/creds.json')
+        cur = getCur(conn)
+        user = {'id': user_id, 'name': name, 'gender': gender, 'age': int(age)}
+        print(user)
+        write_new_user_to_db(cur, user)
+
+    # close connection
     conn.commit()
     cur.close()
     conn.close()
@@ -50,7 +63,7 @@ def new_user():
 
 
 @app.route("/post-login", methods=["POST"])
-def existing_user():
+def post_login():
 
     error = None
 
@@ -78,7 +91,7 @@ def existing_user():
 @app.route("/prefer", methods=["GET"])
 def prefer():
 
-    # check if the user has a cookie already, if not, set it
+    # check if the user has a cookie already, if not, create one
     if 'userID' not in request.cookies:
         user_id = str(uuid.uuid4().hex)
     else:
@@ -104,7 +117,9 @@ def prefer():
                            product_id=item_id,
                            product_image=item_image))
 
-    resp.set_cookie('userID', user_id)
+    # set the cookie if it wasn't already there
+    if 'userID' not in request.cookies:
+        resp.set_cookie('userID', user_id)
 
     return resp
 

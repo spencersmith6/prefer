@@ -31,7 +31,10 @@
     </div>
     <div class="container" id="user-form-container">
         <div class="row">
-            <form action="/new-user" method=post enctype=multipart/form-data>
+            {% if error %}
+                <p class=error><strong>Error:</strong> {{ error }}
+            {% endif %}
+            <form action="/post-signup" method=post enctype=multipart/form-data>
                 <div class="row u-small-padding">
                     <label user-form->Name:</label>
                     <input type="text" name="name" class="u-full-width">
