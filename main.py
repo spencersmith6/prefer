@@ -1,38 +1,66 @@
 from flask import Flask, request, render_template, redirect, url_for, jsonify, make_response
 import uuid
 from db_admin.sql_helper import getConn, getCur
+<<<<<<< HEAD
 from utils.db_utils import get_item_by_id, write_new_user_to_db, write_new_rating_to_db
 import random
 import numpy as np
+=======
+from utils.db_utils import get_item_by_id, write_new_user_to_db, write_new_rating_to_db, check_if_user_in_db
+import model.explore_or_exploit
+>>>>>>> 53e5b0f473d8acbaf2a158fd60e657cde6df1dfd
 
 app = Flask(__name__)
 
 
 @app.route("/", methods=["GET"])
 def index():
-    return app.send_static_file('user_form.html')
+    return app.send_static_file('index.html')
 
 
-@app.route("/user", methods=["POST"])
-def user_form():
+@app.route("/signup", methods=["GET"])
+def signup(error=None):
+    return render_template('signup.html', error=error)
+
+
+@app.route("/login", methods=["GET"])
+def login(error=None):
+    return render_template('login.html', error=error)
+
+
+@app.route("/post-signup", methods=["POST"])
+def post_signup():
 
     # Get data from form
     print request.form
+    user_id = request.form['username']
     name = request.form['name']
     gender = request.form['gender']
     age = request.form['age']
 
-    # Generate user ID and set cookie
-    session_user_id = str(uuid.uuid4().hex)
-    resp = redirect(url_for('prefer'))
-    resp.set_cookie('userID', session_user_id)
-
-    # Write user data with session id to db
+    # open connection
     conn = getConn('db_admin/creds.json')
     cur = getCur(conn)
-    user = {'id': session_user_id, 'name': name, 'gender': gender, 'age': int(age)}
-    print(user)
-    write_new_user_to_db(cur, user)
+
+    # check whether user is in user database already
+    in_db = check_if_user_in_db(cur, user_id)
+
+    if in_db:
+        # Return sign-up with error
+        resp = signup(error='Username already exists.')
+    else:
+        # Set cookie as user ID
+        resp = redirect(url_for('prefer'))
+        resp.set_cookie('userID', user_id)
+
+        # Write user data with session id to db
+        conn = getConn('db_admin/creds.json')
+        cur = getCur(conn)
+        user = {'id': user_id, 'name': name, 'gender': gender, 'age': int(age)}
+        print(user)
+        write_new_user_to_db(cur, user)
+
+    # close connection
     conn.commit()
     cur.close()
     conn.close()
@@ -40,13 +68,48 @@ def user_form():
     return resp
 
 
+@app.route("/post-login", methods=["POST"])
+def post_login():
+
+    error = None
+
+    # Get data from form
+    print request.form
+    user_id = request.form['username']
+
+    # check that user is in user database
+    conn = getConn('db_admin/creds.json')
+    cur = getCur(conn)
+    in_db = check_if_user_in_db(cur, user_id)
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    if in_db:
+        # Set cookie as user ID
+        resp = redirect(url_for('prefer'))
+        resp.set_cookie('userID', user_id)
+        return resp
+    else:
+        return login(error='Invalid username.')
+
+
 @app.route("/prefer", methods=["GET"])
 def prefer():
 
-    # get any item from the database
+    # check if the user has a cookie already, if not, create one
+    if 'userID' not in request.cookies:
+        user_id = str(uuid.uuid4().hex)
+    else:
+        user_id = request.cookies.get('userID')
+
+    # get new item id from backend
+    item_id = model.explore_or_exploit.get_next_item(user_id)
+
+    # get item from the database
     conn = getConn('db_admin/creds.json')
     cur = getCur(conn)
-    item = get_item_by_id(cur)
+    item = get_item_by_id(cur, item_id)
     conn.commit()
     cur.close()
     conn.close()
@@ -60,10 +123,9 @@ def prefer():
                            product_id=item_id,
                            product_image=item_image))
 
-    # check if the user has a cookie already, if not, set it
+    # set the cookie if it wasn't already there
     if 'userID' not in request.cookies:
-        session_user_id = str(uuid.uuid4().hex)
-        resp.set_cookie('userID', session_user_id)
+        resp.set_cookie('userID', user_id)
 
     return resp
 
@@ -83,15 +145,18 @@ def next_prefer():
     print product_id
     print user_id
 
-    # write to db
+    # open connection
     conn = getConn('db_admin/creds.json')
     cur = getCur(conn)
+
+    # write to db
     write_new_rating_to_db(cur, user_id, product_id, rating)
 
     # get new item
-    # TODO: this should be generated using backend service, for now, it's random
-    item_ids = ['0002200120','0002234572','0002237245','0002231832','0002218615']
-    new_item = get_item_by_id(cur, item_id=random.choice(item_ids))
+    new_item_id = model.explore_or_exploit.get_next_item(user_id)
+    new_item = get_item_by_id(cur, new_item_id)
+
+    # close connection
     conn.commit()
     cur.close()
     conn.close()
@@ -101,4 +166,6 @@ def next_prefer():
                    product_image=new_item['im_url'])
 
 
-app.run(host='0.0.0.0')
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')
+

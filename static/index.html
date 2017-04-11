@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
     <!-- Basic Page Needs
     –––––––––––––––––––––––––––––––––––––––––––––––––– -->
     <meta charset="utf-8">
@@ -23,36 +22,20 @@
     <link rel="stylesheet" href="static/css/skeleton.css">
     <link rel="stylesheet" href="static/css/normalize.css">
 
-    <!-- Javascript
-    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-    </script>
-    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
-    <script type="text/javascript"  src="static/scripts/swipe.js"></script>
-
 </head>
 <body>
     <div class="container">
-        <div class="row u-center">
-            <h1>What is your preference?</h1>
+        <div class="row u-center" id="welcome-header">
+            <h1>welcome to prefer</h1>
         </div>
-        <div class="row u-center" id="product-container">
-            <div id="product-img-container">
-                <img id="product-img" src="{{product_image}}">
+    </div>
+    <div class="container" id="user-form-container">
+        <div class="row">
+            <div class="one-half column u-small-padding u-center">
+                <a class="button button-primary" href="/login">Login</a>
             </div>
-            <div id="product-name-container">
-                <p id="product-name">{{product_name}}</p>
-            </div>
-        </div>
-        <div class="row u-center">
-            <div id="like-buttons-container">
-                <div class="one-half column u-small-padding">
-                    <button class="preference-button button-primary" id="dislike-button">Dislike</button>
-                </div>
-                <div class="one-half column u-small-padding">
-                    <button class="preference-button button-primary" id="like-button">Like</button>
-                </div>
-                <p style="visibility: hidden" id="product-id">{{product_id}}</p>
+            <div class="one-half column u-small-padding u-center">
+                <a class="button button-primary" href="/signup">Sign-Up</a>
             </div>
         </div>
     </div>

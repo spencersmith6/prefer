@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
     <!-- Basic Page Needs
     –––––––––––––––––––––––––––––––––––––––––––––––––– -->
     <meta charset="utf-8">
@@ -23,37 +22,27 @@
     <link rel="stylesheet" href="static/css/skeleton.css">
     <link rel="stylesheet" href="static/css/normalize.css">
 
-    <!-- Javascript
-    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-    </script>
-    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
-    <script type="text/javascript"  src="static/scripts/swipe.js"></script>
-
 </head>
 <body>
     <div class="container">
-        <div class="row u-center">
-            <h1>What is your preference?</h1>
+        <div class="row u-center" id="welcome-header">
+            <h1>welcome back to prefer</h1>
         </div>
-        <div class="row u-center" id="product-container">
-            <div id="product-img-container">
-                <img id="product-img" src="{{product_image}}">
-            </div>
-            <div id="product-name-container">
-                <p id="product-name">{{product_name}}</p>
-            </div>
-        </div>
-        <div class="row u-center">
-            <div id="like-buttons-container">
-                <div class="one-half column u-small-padding">
-                    <button class="preference-button button-primary" id="dislike-button">Dislike</button>
+    </div>
+    <div class="container" id="user-form-container">
+        <div class="row">
+            <form action="/post-login" method=post enctype=multipart/form-data>
+                <div class="row u-small-padding">
+                    {% if error %}
+                        <p class=error><strong>Error:</strong> {{ error }}
+                    {% endif %}
+                    <label user-form->Username:</label>
+                    <input type="text" name="username" class="u-full-width">
                 </div>
-                <div class="one-half column u-small-padding">
-                    <button class="preference-button button-primary" id="like-button">Like</button>
+                <div class="row u-small-padding u-center">
+                    <input id="user-form-submit" class="button-primary" type="submit" value="Submit">
                 </div>
-                <p style="visibility: hidden" id="product-id">{{product_id}}</p>
-            </div>
+            </form>
         </div>
     </div>
 </body>
