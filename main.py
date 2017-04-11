@@ -77,22 +77,7 @@ def next_prefer():
     preference = request.form.get('preference', type=str)
     rating = preference_to_rating[preference]
     product_id = request.form.get('product_id', type=str)
-# #<<<<<<< HEAD
-#     print(rating)
-#     print(product_id)
-#
-#     ratings[(session_user_id, product_id)] = rating # TODO: write to RDS
-#
-#     # TODO: this should be generated using backend service
-#     new_product = products.items()[np.random.choice(range(len(products)))]
-#     new_product_id = new_product[0]
-#     new_product_name = new_product[1][0]
-#     new_product_image = new_product[1][3]
-#
-#     return jsonify(product_name=new_product_name,
-#                    product_id=new_product_id,
-#                    product_image=new_product_image)
-# #=======
+
     user_id = request.cookies.get('userID')
     print rating
     print product_id
@@ -114,7 +99,6 @@ def next_prefer():
     return jsonify(product_name=new_item['title'],
                    product_id=new_item['id'],
                    product_image=new_item['im_url'])
-#>>>>>>> 97237548e2916ead5763bc87a97a483cf08e8587
 
 
 app.run(host='0.0.0.0')
