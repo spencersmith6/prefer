@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn import preprocessing
 from sklearn.decomposition import NMF
-import cPickle
+import pickle
 
 # import data
 df = pd.read_csv('data/reviews_reduced.csv', header=0, names=['user', 'item', 'rating'])
@@ -35,10 +35,10 @@ nmf_model.fit(user_item_matrix)
 
 # save models
 with open('data/nmf.pkl', 'wb') as fid:
-    cPickle.dump(nmf_model, fid)
+    pickle.dump(nmf_model, fid)
 
 with open('data/item_encoder.pkl', 'wb') as fid:
-    cPickle.dump(le_item, fid)
+    pickle.dump(le_item, fid)
 
 
 
