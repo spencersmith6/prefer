@@ -3,6 +3,7 @@ import uuid
 from db_admin.sql_helper import getConn, getCur
 from utils.db_utils import get_item_by_id, write_new_user_to_db, write_new_rating_to_db, check_if_user_in_db
 import model.explore_or_exploit
+import pickle
 
 app = Flask(__name__)
 
@@ -98,7 +99,7 @@ def prefer():
         user_id = request.cookies.get('userID')
 
     # get new item id from backend
-    item_id = model.explore_or_exploit.get_next_item(user_id)
+    item_id = model.explore_or_exploit.get_next_item(user_id, le_item, nmf_model)
 
     # get item from the database
     conn = getConn('db_admin/creds.json')
@@ -145,14 +146,17 @@ def next_prefer():
     # write to db
     write_new_rating_to_db(cur, user_id, product_id, rating)
 
+    conn.commit()
+
     # get new item
-    new_item_id = model.explore_or_exploit.get_next_item(user_id)
+    new_item_id = model.explore_or_exploit.get_next_item(user_id, le_item, nmf_model)
     new_item = get_item_by_id(cur, new_item_id)
+
+    conn.commit()
 
     print new_item
 
     # close connection
-    conn.commit()
     cur.close()
     conn.close()
 
@@ -161,6 +165,14 @@ def next_prefer():
                    product_image=new_item['im_url'])
 
 if __name__ == '__main__':
+
+    # load pretrained models
+    with open('data/nmf.pkl', 'rb') as fid:
+        nmf_model = pickle.load(fid)
+
+    with open('data/item_encoder.pkl', 'rb') as fid:
+        le_item = pickle.load(fid)
+
     app.run(host='0.0.0.0')
 
 
