@@ -1,0 +1,7 @@
+psycopg2
+bs4
+pandas
+numpy
+sklearn
+flask
+scipy

@@ -149,6 +149,8 @@ def next_prefer():
     new_item_id = model.explore_or_exploit.get_next_item(user_id)
     new_item = get_item_by_id(cur, new_item_id)
 
+    print new_item
+
     # close connection
     conn.commit()
     cur.close()
