@@ -3,9 +3,14 @@ import numpy as np
 from sklearn import preprocessing
 from sklearn.decomposition import NMF
 import pickle
+from db_admin.sql_helper import getConn
 
-# import data
-df = pd.read_csv('data/reviews_reduced.csv', header=0, names=['user', 'item', 'rating'])
+# import reviews data
+query = """SELECT * FROM reviews"""
+conn = getConn('db_admin/creds.json')
+df = pd.read_sql(query, conn)
+df = df.rename(index=str, columns={"reviewerid": "user", "asin":"item", "overall":"rating"})
+
 
 def transform_rating(x):
     if x < 4.0:
