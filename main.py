@@ -1,17 +1,10 @@
 from flask import Flask, request, render_template, redirect, url_for, jsonify, make_response
 import uuid
 from db_admin.sql_helper import getConn, getCur
-<<<<<<< HEAD
-from utils.db_utils import get_item_by_id, write_new_user_to_db, write_new_rating_to_db
-import random
-import numpy as np
-=======
 from utils.db_utils import get_item_by_id, write_new_user_to_db, write_new_rating_to_db, check_if_user_in_db
 import model.explore_or_exploit
->>>>>>> 53e5b0f473d8acbaf2a158fd60e657cde6df1dfd
 
 app = Flask(__name__)
-
 
 @app.route("/", methods=["GET"])
 def index():
