@@ -81,8 +81,8 @@ if __name__ == '__main__':
     prefs = get_user_prefs('testcookie')
     print prefs
     print " "
-    print "******** User Preferences for User 'kjmacmil' **********"
+    print "******** User Preferences for User 'testcookie' **********"
     print " "
-    prefs = get_user_prefs('kjmacmil')
+    prefs = get_user_prefs('testcookie')
     print prefs
     print " "
