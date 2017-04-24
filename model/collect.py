@@ -16,19 +16,23 @@ def create_etsy_item_dict(item_cols):
             'category': item_cols[5]}
     return item
 
-def get_next_item(user_id, le_item, nmf_model):
+def get_next_item(user_id):
     # TODO: Give next item id in list
     conn = getConn('db_admin/creds.json')
     cur = getCur(conn)
-    query = "SELECT num_reviews from user_meta WHERE WHERE userid = '{}'""".format(user_id)
+    query = "SELECT num_reviews from user_meta WHERE user_id = '{}'""".format(user_id)
     cur.execute(query)
     next_to_rate = int(cur.fetchone()[0]) + 1
 
     conn = getConn('db_admin/creds.json')
     cur = getCur(conn)
-    query = "SELECT asin from etsy_items WHERE id = '{}' LIMIT 1;".format(next_to_rate)
+    query = "SELECT * from etsy_items WHERE id = '{}' LIMIT 1;".format(next_to_rate)
     cur.execute(query)
     item = cur.fetchone()
+    #TODO This is cheating, this means it sets the item as reviewed regardless of if the user actually swipes on it or not. Fix it.
+    query = "UPDATE user_meta SET num_reviews = num_reviews + 1 WHERE user_meta.user_id = '{}';".format(user_id)
+    cur.execute(query)
+    conn.commit()
     item_dict = create_etsy_item_dict(item)
     cur.close()
 
