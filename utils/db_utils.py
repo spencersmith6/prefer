@@ -37,9 +37,9 @@ def write_new_user_to_db(cur, user):
     return None
 
 
-def write_new_rating_to_db(cur, user_id, item_id, rating):
+def write_new_rating_to_db(cur, user_id, item_id, rating, table):
     """user is dict with fiels id, name, gender, age"""
-    query = """ INSERT INTO reviews (reviewerid, asin, overall)
+    query = """ INSERT INTO etsy_reviews (reviewerid, asin, overall)
                 VALUES (%s, %s, %s);
                 """
     cur.execute(query, (user_id, item_id, rating))
