@@ -19,6 +19,14 @@
     margin: auto;
 }
 
+/* Override stacking behavior for buttons */
+@media (min-width: 300px) and (max-width: 550px)  {
+  #like-buttons-container .column {
+    width: 50%;
+    padding: 0;
+    }
+}
+
 
 #product-container {
     position: relative;
