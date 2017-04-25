@@ -1,9 +1,39 @@
 import httplib
 import pandas as pd
 import urllib
-from db_admin.sql_helper import getConn, getCur
+import psycopg2
 
+CREDS = {"dbname": "prefer", "user": "prefer_msan", "host": "prefer.cnnbuuvumzbs.us-west-2.rds.amazonaws.com", "password": "Swiper_no_Swiping?"}
 SERVER = 'ec2-52-26-197-182.us-west-2.compute.amazonaws.com:5000'
+
+
+# Get DB connection using creds dict
+def getConn():
+    creds = CREDS
+    return getPsqlConn(creds)
+
+
+# This gets a default cursor for the DB
+def getCur(conn):
+    return conn.cursor()
+
+
+def getPsqlConn(creds):
+    """
+    This gets a connection to the PostgreSQL database
+    :param creds: Credentials for DB
+    :type creds: Dictionary
+    :return: pycopg2 connection to the DB
+    """
+    try:
+        # Connect to the database
+        conn = psycopg2.connect("dbname='{}' user='{}' host='{}' password='{}'".format(
+            creds['dbname'], creds['user'], creds['host'], creds['password']))
+    except:
+        print "I am unable to connect to the database"
+        return None
+    # Return the connection
+    return conn
 
 
 def get_prefer():
@@ -45,7 +75,7 @@ def get_next_prefer(preference, product_id, cookiename):
 
 def get_user_prefs(id):
     query = """SELECT * FROM reviews WHERE reviewerid = '{}'""".format(id)
-    conn = getConn('db_admin/creds.json')
+    conn = getConn()
     user_reviews = pd.read_sql(query, conn)
     return user_reviews
 
