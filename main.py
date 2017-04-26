@@ -4,6 +4,7 @@ from db_admin.sql_helper import getConn, getCur
 from utils.db_utils import get_item_by_id, write_new_user_to_db, write_new_rating_to_db, check_if_user_in_db
 import model.explore_or_exploit
 import pickle
+import json
 
 app = Flask(__name__)
 
@@ -97,8 +98,8 @@ def prefer():
     else:
         user_id = request.cookies.get('userID')
 
-    # get new item id from backend
-    item_id = model.explore_or_exploit.get_next_item(user_id, le_item, nmf_model)
+    # get new item id from service
+    item_id = json.loads(get_new_item(user_id).data)['item_id']
 
     # get item from the database
     conn = getConn('db_admin/creds.json')
@@ -149,7 +150,7 @@ def next_prefer():
     conn.commit()
 
     # get new item
-    new_item_id = model.explore_or_exploit.get_next_item(user_id, le_item, nmf_model)
+    new_item_id = json.loads(get_new_item(user_id).data)['item_id']
     new_item = get_item_by_id(cur, new_item_id)
 
     conn.commit()
@@ -163,6 +164,15 @@ def next_prefer():
     return jsonify(product_name=new_item['title'],
                    product_id=new_item['id'],
                    product_image=new_item['im_url'])
+
+
+@app.route("/get_new_item/<user_id>", methods=["GET"])
+def get_new_item(user_id):
+
+    # get new item
+    item_id = model.explore_or_exploit.get_next_item(user_id, le_item, nmf_model)
+
+    return jsonify(item_id=item_id)
 
 
 if __name__ == '__main__':

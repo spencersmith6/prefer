@@ -22,6 +22,15 @@ def get_homepage():
     return out
 
 
+def hit_service(user_id):
+    h = httplib.HTTPConnection(SERVER)
+    h.request('GET', 'http://{}/get_new_item/{}'.format(SERVER, user_id))
+    resp = h.getresponse()
+    out = resp.read()
+    return out
+
+
+
 def post_login(username):
     h = httplib.HTTPConnection(SERVER)
     params = urllib.urlencode({'username': username})
@@ -55,6 +64,10 @@ if __name__ == '__main__':
     print "Test of Prefer at ", SERVER
     print "created by Nick Levitt, Kelsey MacMillan and Spencer Smith"
     print "************************************************"
+    print " "
+    print "******** Prefer Hit Service with Username to Return Item Recommendation **********"
+    print " "
+    print hit_service('kjmacmil')
     print " "
     print "******** Prefer Home Page **********"
     print " "
