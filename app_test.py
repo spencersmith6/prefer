@@ -4,7 +4,7 @@ import urllib
 import psycopg2
 
 CREDS = {"dbname": "prefer", "user": "prefer_msan", "host": "prefer.cnnbuuvumzbs.us-west-2.rds.amazonaws.com", "password": "Swiper_no_Swiping?"}
-SERVER = '0.0.0.0:5000'
+SERVER = 'ec2-52-26-197-182.us-west-2.compute.amazonaws.com:5000'
 
 
 # Get DB connection using creds dict
