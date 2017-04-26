@@ -16,7 +16,7 @@ def create_etsy_item_dict(item_cols):
             'category': item_cols[5]}
     return item
 
-def get_next_item(user_id):
+def get_next_item(user_id, le_item, nmf_model):
     # TODO: Give next item id in list
     conn = getConn('db_admin/creds.json')
     cur = getCur(conn)
