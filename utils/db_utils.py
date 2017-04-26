@@ -30,10 +30,10 @@ def get_item_by_id(cur, item_id=None):
 
 def write_new_user_to_db(cur, user):
     """user is dict with fiels id, name, gender, age"""
-    query = """ INSERT INTO user_meta (user_id, name, gender, age)
-                VALUES (%s, %s, %s, %s);
+    query = """ INSERT INTO user_meta (user_id, name, gender, age, email)
+                VALUES (%s, %s, %s, %s, %s);
                 """
-    cur.execute(query, (user['id'], user['name'], user['gender'], user['age']))
+    cur.execute(query, (user['id'], user['name'], user['gender'], user['age'], user['email']))
     return None
 
 
