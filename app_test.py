@@ -1,7 +1,15 @@
+import unittest
 import httplib
 import pandas as pd
 import urllib
+
+import uuid
 from db_admin.sql_helper import getConn, getCur
+from utils.db_utils import get_item_by_id, write_new_user_to_db, write_new_rating_to_db, check_if_user_in_db
+import model.explore_or_exploit
+import model.explore
+import model.exploit
+
 
 SERVER = 'ec2-52-26-197-182.us-west-2.compute.amazonaws.com:5000'
 
