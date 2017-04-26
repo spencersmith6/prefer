@@ -33,6 +33,7 @@ def post_signup():
     name = request.form['name']
     gender = request.form['gender']
     age = request.form['age']
+    email = request.form['email']
 
     # open connection
     conn = getConn('db_admin/creds.json')
@@ -52,7 +53,7 @@ def post_signup():
         # Write user data with session id to db
         conn = getConn('db_admin/creds.json')
         cur = getCur(conn)
-        user = {'id': user_id, 'name': name, 'gender': gender, 'age': int(age)}
+        user = {'id': user_id, 'name': name, 'gender': gender, 'age': int(age), 'email': email}
         print(user)
         write_new_user_to_db(cur, user)
 
