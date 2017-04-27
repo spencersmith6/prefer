@@ -5,3 +5,7 @@ numpy
 sklearn
 flask
 scipy
+os
+pickle
+json
+re

@@ -4,6 +4,7 @@ from db_admin.sql_helper import getConn, getCur
 from utils.db_utils import get_item_by_id, write_new_user_to_db, write_new_rating_to_db, check_if_user_in_db
 import model.explore_or_exploit
 import pickle
+import os
 
 app = Flask(__name__)
 
@@ -174,5 +175,6 @@ if __name__ == '__main__':
     with open('data/item_encoder.pkl', 'rb') as fid:
         le_item = pickle.load(fid)
 
-    app.run(host='0.0.0.0')
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
 
