@@ -1,5 +1,4 @@
 *.idea*
-*.json
 *.gz
 *.pyc
 mat_fac.py
