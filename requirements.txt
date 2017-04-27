@@ -1,7 +1,9 @@
-psycopg2
-bs4
-pandas
-numpy
-sklearn
-flask
-scipy
+Flask-Cors==3.0.2
+numpy==1.11.3
+pandas==0.19.2
+pathlib2==2.2.0
+pickleshare==0.7.4
+requests==2.12.4
+scipy==0.18.1
+sklearn==0.0
+virtualenv==15.1.0
