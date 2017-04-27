@@ -39,10 +39,10 @@ nmf_model = NMF(50)
 nmf_model.fit(user_item_matrix)
 
 # save models
-with open('data/nmf.pkl', 'wb') as fid:
+with open('nmf.pkl', 'wb') as fid:
     pickle.dump(nmf_model, fid)
 
-with open('data/item_encoder.pkl', 'wb') as fid:
+with open('item_encoder.pkl', 'wb') as fid:
     pickle.dump(le_item, fid)
 
 
