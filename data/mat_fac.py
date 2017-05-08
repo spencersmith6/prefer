@@ -36,8 +36,6 @@ dataDF = pd.read_sql(query, conn)
 print(time()-st)
 
 
-1+1
-
 title_dict = dataDF.set_index('asin')['title'].to_dict()
 ratingsDF = dataDF[['reviewerid', 'asin', 'overall']]
 
@@ -90,8 +88,13 @@ model.fit([train.reviewerid, train.asin], train.overall, batch_size=64, nb_epoch
 model.fit([train.reviewerid, train.asin], train.overall, batch_size=64, nb_epoch=5,
           validation_data=([validate.reviewerid, validate.asin], validate.overall))
 
+for i in range(500,550):
+    print(title_dict[products[i]], model.predict([np.array([1]), np.array([i])]))
 
-model.predict([np.array([3]), np.array([6])])
+reviewer[1]
+
+
+
 
 # ## Analyze results
 
