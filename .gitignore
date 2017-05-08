@@ -2,7 +2,6 @@
 *.json
 *.gz
 *.pyc
-mat_fac.py
 *.enc
 /db_admin/data/*_inserts/*
 .idea/*
