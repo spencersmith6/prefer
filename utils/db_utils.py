@@ -14,12 +14,12 @@ def get_item_by_id(cur, item_id=None):
 
     if item_id is None:
 
-        query = """SELECT * FROM item_meta LIMIT 1;"""
+        query = """SELECT * FROM etsy_items LIMIT 1;"""
         cur.execute(query)
 
     else:
 
-        query = """ SELECT * FROM item_meta WHERE asin = %s;"""
+        query = """ SELECT * FROM etsy_items WHERE asin = %s;"""
         cur.execute(query, (item_id,))
 
     item_cols = cur.fetchone()

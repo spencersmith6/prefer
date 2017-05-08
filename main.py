@@ -101,16 +101,16 @@ def prefer():
     else:
         user_id = request.cookies.get('userID')
 
-    # # get new item id from backend
-    # item_id = model.explore_or_exploit.get_next_item(user_id, le_item, nmf_model)
+    # get new item id from backend
+    item_id = model.explore_or_exploit.get_next_item(user_id, le_item, nmf_model)
 
-    # # get item from the database
-    # conn = getConn('db_admin/creds.json')
-    # cur = getCur(conn)
-    # item = get_item_by_id(cur, item_id)
-    # conn.commit()
-    # cur.close()
-    # conn.close()
+    # get item from the database
+    conn = getConn('db_admin/creds.json')
+    cur = getCur(conn)
+    item = get_item_by_id(cur, item_id)
+    conn.commit()
+    cur.close()
+    conn.close()
 
     item = model.collect.get_next_item(user_id)
 
@@ -153,15 +153,14 @@ def next_prefer():
     # write to db
     write_new_rating_to_db(cur, user_id, product_id, rating, 'etsy_reviews')
     conn.commit()
-    print "TIME TO WRITE REVIEW = {} SECONDS".format(time()-t)
     t = time()
+
     # get new item
-    # new_item_id = model.explore_or_exploit.get_next_item(user_id, le_item, nmf_model)
-    # new_item = get_item_by_id(cur, new_item_id)
+    new_item_id = model.explore_or_exploit.get_next_item(user_id, le_item, nmf_model)
+    new_item = get_item_by_id(cur, new_item_id)
     new_item = model.collect.get_next_item(user_id)
 
     conn.commit()
-    print "TIME TO COLLECT NEW ITEM = {} SECONDS".format(time() - t)
     print new_item
 
     # close connection
