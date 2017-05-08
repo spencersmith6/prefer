@@ -6,7 +6,7 @@ import model.explore_or_exploit
 import model.collect
 import pickle
 import os
-from time import time
+
 
 app = Flask(__name__)
 
@@ -112,8 +112,6 @@ def prefer():
     cur.close()
     conn.close()
 
-    item = model.collect.get_next_item(user_id)
-
     # create response to client
     item_id = item['id']
     item_name = item['title']
@@ -132,7 +130,6 @@ def prefer():
 
 @app.route("/next_prefer", methods=["POST"])
 def next_prefer():
-    t = time()
     # define preference to rating dictionary
     preference_to_rating = {"Dislike": 0.0, "Like": 1.0}
 
@@ -153,12 +150,10 @@ def next_prefer():
     # write to db
     write_new_rating_to_db(cur, user_id, product_id, rating, 'etsy_reviews')
     conn.commit()
-    t = time()
 
     # get new item
     new_item_id = model.explore_or_exploit.get_next_item(user_id, le_item, nmf_model)
     new_item = get_item_by_id(cur, new_item_id)
-    new_item = model.collect.get_next_item(user_id)
 
     conn.commit()
     print new_item

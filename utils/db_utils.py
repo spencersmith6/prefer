@@ -2,10 +2,8 @@ def create_item_dict(item_cols):
     """Create item object from data return from query"""
     item = {'id': item_cols[0],
             'title': item_cols[1],
-            'description': item_cols[2],
-            'price': item_cols[3],
-            'brand': item_cols[4],
-            'im_url': item_cols[5]}
+            'link': item_cols[2],
+            'im_url': item_cols[3]}
     return item
 
 
