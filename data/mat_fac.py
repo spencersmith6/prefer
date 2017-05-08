@@ -17,7 +17,6 @@ from keras.regularizers import l2
 from time import time
 
 
-
 def embedding_input(name, n_in, n_out, reg):
     inp = Input(shape=(1,), dtype='int64', name=name)
     return inp, Embedding(n_in, n_out, input_length=1, W_regularizer=l2(reg))(inp)
@@ -32,12 +31,12 @@ cur = getCur(conn)
 
 
 st = time()
-query = 'SELECT reviewerid, reviews.asin AS asin, overall, title FROM reviews LEFT JOIN item_meta ON reviews.asin = item_meta.asin LIMIT 100000;'
+query = 'SELECT reviewerid, etsy_reviews.asin AS asin, overall, title FROM etsy_reviews LEFT JOIN etsy_items ON etsy_reviews.asin = etsy_items.asin;'
 dataDF = pd.read_sql(query, conn)
 print(time()-st)
 
 
-
+1+1
 
 title_dict = dataDF.set_index('asin')['title'].to_dict()
 ratingsDF = dataDF[['reviewerid', 'asin', 'overall']]
