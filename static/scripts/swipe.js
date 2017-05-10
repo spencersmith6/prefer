@@ -19,6 +19,7 @@ $(document).ready(function(){
 
                 $('#product-id').text(newProduct.product_id)
                 $('#product-name').text(newProduct.product_name)
+                $('#link_button').attr("href", newProduct.product_link)
                 // wait until image is loaded, then reset image position
                 $('#product-img').load(function() {$("#product-container").animate({'right':'0px'}, 0).animate({'opacity': '1.0'}, 100 ) })
                 $('#product-img').attr("src", newProduct.product_image)

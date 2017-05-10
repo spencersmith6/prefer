@@ -116,10 +116,12 @@ def prefer():
     item_id = item['id']
     item_name = item['title']
     item_image = item['im_url']
+    item_link = item['link']
     resp = make_response(render_template('prefer.html',
                            product_name=item_name,
                            product_id=item_id,
-                           product_image=item_image))
+                           product_image=item_image,
+                           product_link=item_link))
 
     # set the cookie if it wasn't already there
     if 'userID' not in request.cookies:
@@ -164,7 +166,8 @@ def next_prefer():
 
     return jsonify(product_name=new_item['title'],
                    product_id=new_item['id'],
-                   product_image=new_item['im_url'])
+                   product_image=new_item['im_url'],
+                   product_link=new_item['link'])
 
 
 if __name__ == '__main__':
