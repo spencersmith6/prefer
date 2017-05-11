@@ -6,19 +6,24 @@ import pickle
 from db_admin.sql_helper import getConn
 
 # import reviews data
-query = """SELECT * FROM reviews"""
+query = """SELECT * FROM etsy_reviews"""
 conn = getConn('db_admin/creds.json')
-df = pd.read_sql(query, conn)
-df = df.rename(index=str, columns={"reviewerid": "user", "asin":"item", "overall":"rating"})
+df_reviews = pd.read_sql(query, conn)
+df_reviews = df_reviews.rename(index=str, columns={"reviewerid": "user", "asin":"item", "overall":"rating"})
 
+# import all other items
+query = """SELECT asin FROM etsy_items"""
+df_items = pd.read_sql(query, conn)
+df_items = df_items.rename(index=str, columns={"asin":"item"})
 
-def transform_rating(x):
-    if x < 4.0:
-        return 0.0
-    else:
-        return 1.0
+# create a "no_rating" user and assign all zeros
+df_items['user'] = pd.Series(['no_rating']*len(df_items['item']), index=df_items.index)
+df_items['rating'] = pd.Series([0.5]*len(df_items['item']), index=df_items.index)
 
-df['rating_transformed'] = df['rating'].apply(transform_rating)
+# concatenate data frames
+df = pd.concat([df_reviews, df_items], axis=0, ignore_index=True)
+
+print df
 
 # label encoding
 le_item = preprocessing.LabelEncoder()
@@ -28,7 +33,7 @@ le_user= preprocessing.LabelEncoder()
 user_inds = le_user.fit_transform(df['user'])
 
 # create user item matrix
-rating = np.array(df['rating_transformed'])
+rating = np.array(df['rating'])
 user_item_matrix = np.zeros((len(set(user_inds)), len(set(item_inds))))
 
 for u, i, r in zip(user_inds, item_inds, rating):
@@ -44,8 +49,3 @@ with open('data/nmf.pkl', 'wb') as fid:
 
 with open('data/item_encoder.pkl', 'wb') as fid:
     pickle.dump(le_item, fid)
-
-
-
-
-
